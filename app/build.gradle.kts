@@ -20,6 +20,9 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+    buildFeatures {
+        buildConfig = true
+    }
 
     buildTypes {
         release {
@@ -28,6 +31,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        getByName("debug") {
+            buildConfigField("String", "BASE_URL", "\"https://api.openweathermap.org\"")
+        }
+        getByName("release") {
+            buildConfigField("String", "BASE_URL", "\"https://api.openweathermap.org\"")
         }
     }
     compileOptions {
@@ -64,4 +73,7 @@ dependencies {
 
     //coil
     implementation("io.coil-kt:coil:2.4.0")
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6") // Check for the latest version
+
 }
