@@ -6,15 +6,15 @@ import java.util.Locale
 import java.util.TimeZone
 
 /**
- * Extension functions for the weather details conversion
+ * Convert TimeStamp To DateTime String
  */
-fun Int.unixTimestampToDateTimeString() : String {
+fun Int.getTimestampToDateTimeString() : String {
 
     try {
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = this*1000.toLong()
 
-        val outputDateFormat = SimpleDateFormat("dd MMM, yyyy - hh:mm a", Locale.ENGLISH)
+        val outputDateFormat = SimpleDateFormat("MMM dd, yyyy - hh:mm a", Locale.ENGLISH)
         outputDateFormat.timeZone = TimeZone.getDefault()
         return outputDateFormat.format(calendar.time)
 
@@ -25,7 +25,10 @@ fun Int.unixTimestampToDateTimeString() : String {
     return this.toString()
 }
 
-fun Int.unixTimestampToTimeString() : String {
+/**
+ * Convert TimeStamp To Time String
+ */
+fun Int.getTimestampToTimeString() : String {
 
     try {
         val calendar = Calendar.getInstance()

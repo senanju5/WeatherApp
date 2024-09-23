@@ -5,6 +5,9 @@ import com.example.weatherapp.utils.ApiConfig.API_KEY
 /**
  * AppConfig utils
  */
+/**
+ * AppConfig utils for API configuration
+ */
 internal  object ApiConfig {
         const val BASE_URL = "https://api.openweathermap.org"
         const val API_KEY = "6b752f3d405f987d00a62dd42d7b4017"
@@ -13,6 +16,9 @@ internal  object ApiConfig {
         const val GEO_ENDPOINT = "/geo/1.0/direct"
 }
 
+/**
+ * This method to form weather API query param
+ */
 fun getWeatherQuery(lat:String,lon:String):HashMap<String,String> {
     val query = HashMap<String, String>()
     query["lat"] = lat
@@ -22,6 +28,9 @@ fun getWeatherQuery(lat:String,lon:String):HashMap<String,String> {
     return query
 }
 
+/**
+ * This method to form geocode API query param
+ */
 fun getGeoCodeQuery(searchString:String):HashMap<String,String> {
     val query = HashMap<String, String>()
     query["q"] = searchString

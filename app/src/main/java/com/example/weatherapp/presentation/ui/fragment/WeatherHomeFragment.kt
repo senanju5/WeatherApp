@@ -34,6 +34,10 @@ class WeatherHomeFragment : Fragment() {
     private lateinit var weatherViewModel: WeatherViewModel
     private lateinit var binding: FragmentWeatherHomeBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    /**
+     * Register the permissions callback, which handles the user's response to the
+     */
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
@@ -84,7 +88,11 @@ class WeatherHomeFragment : Fragment() {
         requestPermission()
     }
 
+
     init {
+        /**
+         * Observing the weather UI model
+         */
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                     weatherViewModel.weatherUIModel.collect {
@@ -105,6 +113,9 @@ class WeatherHomeFragment : Fragment() {
         }
     }
 
+    /**
+     * requesting the location permission
+     */
     private fun requestPermission() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
@@ -113,11 +124,13 @@ class WeatherHomeFragment : Fragment() {
             // Request permission
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         } else {
-            // Permission already granted, get the location
             getWeatherDetails()
         }
     }
 
+    /**
+     * getting the weather details
+     */
     private fun getWeatherDetails() {
 
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -135,6 +148,9 @@ class WeatherHomeFragment : Fragment() {
         }
     }
 
+    /**
+     * setting the weather details
+     */
     private fun setWeatherDetails (weatherUIDetails: WeatherUIDetails) {
         binding.weatherDetailsView.dateTimeTextView.text = weatherUIDetails.dateTime
         binding.weatherDetailsView.temperatureTextView.text = weatherUIDetails.temperature
@@ -152,21 +168,33 @@ class WeatherHomeFragment : Fragment() {
         updateGeoCode(weatherUIDetails.lat, weatherUIDetails.lon)
     }
 
+    /**
+     * saving the location
+     */
     override fun onStop() {
         super.onStop()
         saveLocation(currentLat, currentLon)
     }
 
+    /**
+     * saving the location
+     */
     override fun onPause() {
        super.onPause()
         saveLocation(currentLat, currentLon)
     }
 
+    /**
+     * updating the last used geo code
+     */
     private fun updateGeoCode(lat: String, lon: String) {
         currentLat = lat
         currentLon = lon
     }
 
+    /**
+     * saving the location into shared preference
+     */
     private fun saveLocation(latitude: String, longitude: String) {
         val sharedPref = requireActivity().getSharedPreferences("location_prefs", Context.MODE_PRIVATE)
         if(latitude.isNotEmpty() && longitude.isNotEmpty()){
@@ -177,6 +205,9 @@ class WeatherHomeFragment : Fragment() {
         }
     }
 
+    /**
+     * getting the last used location from shared preference
+     */
     fun getLastLocation(): Pair<String, String>? {
         val sharedPref = requireActivity().getSharedPreferences("location_prefs", Context.MODE_PRIVATE)
         val lat = sharedPref.getString("latitude", null)

@@ -1,6 +1,5 @@
 package com.example.weatherapp.presentation.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.data.model.WeatherUIDetails
@@ -13,8 +12,8 @@ import com.example.weatherapp.domain.WeatherUseCase
 import com.example.weatherapp.presentation.uimodel.WeatherUIModel
 import com.example.weatherapp.utils.ApiConfig
 import com.example.weatherapp.utils.getWeatherQuery
-import com.example.weatherapp.utils.unixTimestampToDateTimeString
-import com.example.weatherapp.utils.unixTimestampToTimeString
+import com.example.weatherapp.utils.getTimestampToDateTimeString
+import com.example.weatherapp.utils.getTimestampToTimeString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,6 +30,9 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
     internal val weatherUIModel : StateFlow<WeatherUIModel> = weatherMutableSate
 
 
+    /**
+     * Get geo code details
+     */
      fun getGeoCode(queries: Map<String, String>) {
          weatherMutableSate.value = WeatherUIModel(true, null, false)
          viewModelScope.launch {
@@ -45,6 +47,9 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
         }
     }
 
+    /**
+     * Handle geo code response
+     */
     private fun handleGeoCodeResponse(geoCodes: GeoCodes): GeoCodesItem? {
         if(geoCodes.isNotEmpty()){
             return geoCodes[0]
@@ -53,6 +58,9 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
         }
     }
 
+    /**
+     * Get weather details
+     */
     fun getWeatherDetails(queries: Map<String, String>) {
         weatherMutableSate.value = WeatherUIModel(true, null, false)
 
@@ -68,10 +76,13 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
     }
      }
 
+    /**
+     * Handle weather response
+     */
     private fun handleWeatherResponse(weatherDetails: WeatherModel): WeatherUIDetails? {
             val weather = getWeather(weatherDetails.weather)
             return WeatherUIDetails(
-                dateTime = weatherDetails.dt.unixTimestampToDateTimeString(),
+                dateTime = weatherDetails.dt.getTimestampToDateTimeString(),
                 temperature = weatherDetails.main.temp.toString(),
                 cityAndCountry = "${weatherDetails.name}, ${weatherDetails.sys.country}",
                 weatherIcon = "${ApiConfig.WEATHER_ICON_ENDPOINT+weather.icon}.png",
@@ -79,13 +90,16 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
                 humidity = "${weatherDetails.main.humidity}%",
                 pressure = "${weatherDetails.main.pressure} mBar",
                 visibility = "${weatherDetails.visibility/1000.0} KM",
-                sunrise = weatherDetails.sys.sunrise.unixTimestampToTimeString(),
-                sunset = weatherDetails.sys.sunset.unixTimestampToTimeString(),
+                sunrise = weatherDetails.sys.sunrise.getTimestampToTimeString(),
+                sunset = weatherDetails.sys.sunset.getTimestampToTimeString(),
                 lat = weatherDetails.coord.lat.toString(),
                 lon = weatherDetails.coord.lon.toString())
 
     }
 
+    /**
+     * Get weather
+     */
     fun getWeather(weatherList: List<Weather>): Weather {
         if(weatherList.isNotEmpty()){
             return Weather(
