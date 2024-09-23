@@ -64,6 +64,7 @@ class WeatherHomeFragment : Fragment() {
         binding.searchView.searchButton.setOnClickListener {
             val query = binding.searchView.cityEditTextView.text.toString()
             if (query.isNotEmpty()){
+                //TODO: InFuture this needs to be handled using GooGle API
                 if(isValidStateOrCity(query)){
                     weatherViewModel.getGeoCode(getGeoCodeQuery(query))
                 } else {
