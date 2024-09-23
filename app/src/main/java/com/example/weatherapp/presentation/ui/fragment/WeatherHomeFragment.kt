@@ -22,6 +22,9 @@ import com.example.weatherapp.data.model.WeatherUIDetails
 import com.example.weatherapp.databinding.FragmentWeatherHomeBinding
 import com.example.weatherapp.presentation.viewmodel.WeatherViewModel
 import com.example.weatherapp.utils.CitiUtils.isValidStateOrCity
+import com.example.weatherapp.utils.SharePreferenceUtils.KEY_LATITUDE
+import com.example.weatherapp.utils.SharePreferenceUtils.KEY_LONGITUDE
+import com.example.weatherapp.utils.SharePreferenceUtils.LOCATION_PREFS
 import com.example.weatherapp.utils.getGeoCodeQuery
 import com.example.weatherapp.utils.getWeatherQuery
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -43,19 +46,7 @@ class WeatherHomeFragment : Fragment() {
             if (isGranted) {
                 getWeatherDetails()
             } else {
-                val location = getLastLocation()
-                if (location == null) {
-                    Toast.makeText(requireContext(), "Please enter the values manually to get the weather", Toast.LENGTH_SHORT).show()
-                } else {
-                    location.let {
-                        val latitude = it.first
-                        val longitude = it.second
-                        // Use the latitude and longitude
-                        updateGeoCode(latitude, longitude)
-                        weatherViewModel.getWeatherDetails(getWeatherQuery(latitude, longitude))
-                    }
-                }
-
+                getWeatherDetailsByLastLocation()
             }
         }
 
@@ -67,16 +58,24 @@ class WeatherHomeFragment : Fragment() {
         binding = FragmentWeatherHomeBinding.inflate(inflater, container, false)
         binding.searchView.searchButton.setOnClickListener {
             val query = binding.searchView.cityEditTextView.text.toString()
-            if (query.isNotEmpty()){
+            if (query.isNotEmpty()) {
                 //TODO: InFuture this needs to be handled using GooGle API
-                if(isValidStateOrCity(query)){
+                if (isValidStateOrCity(query)) {
                     weatherViewModel.getGeoCode(getGeoCodeQuery(query))
                 } else {
-                    Toast.makeText(requireContext(), "please enter valid city or state in USA", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "please enter valid city or state in USA",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
 
             } else {
-                Toast.makeText(requireContext(), "please enter some value to search", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "please enter some value to search",
+                    Toast.LENGTH_SHORT
+                ).show()
 
             }
         }
@@ -95,17 +94,18 @@ class WeatherHomeFragment : Fragment() {
          */
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    weatherViewModel.weatherUIModel.collect {
-                        binding.progressLoader.visibility =if (it.isLoading) View.VISIBLE else View.GONE
-                        if (it.weatherDetails!=null)  {
-                            binding.weatherDetailsView.root.visibility = View.VISIBLE
-                            setWeatherDetails(it.weatherDetails)
-                        } else {
-                            if(it.isError) {
-                                binding.weatherErrorView.root.visibility = View.VISIBLE
-                                binding.weatherDetailsView.root.visibility = View.GONE
-                            }
+                weatherViewModel.weatherUIModel.collect {
+                    binding.progressLoader.visibility =
+                        if (it.isLoading) View.VISIBLE else View.GONE
+                    if (it.weatherDetails != null) {
+                        binding.weatherDetailsView.root.visibility = View.VISIBLE
+                        setWeatherDetails(it.weatherDetails)
+                    } else {
+                        if (it.isError) {
+                            binding.weatherErrorView.root.visibility = View.VISIBLE
+                            binding.weatherDetailsView.root.visibility = View.GONE
                         }
+                    }
                 }
 
             }
@@ -120,7 +120,11 @@ class WeatherHomeFragment : Fragment() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
         // Check for location permission
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             // Request permission
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         } else {
@@ -133,16 +137,25 @@ class WeatherHomeFragment : Fragment() {
      */
     private fun getWeatherDetails() {
 
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                 if (location != null) {
                     // Use the location to get weather data
                     val latitude: String = location.latitude.toString()
-                    val longitude:String = location.longitude.toString()
+                    val longitude: String = location.longitude.toString()
                     updateGeoCode(latitude, longitude)
                     weatherViewModel.getWeatherDetails(getWeatherQuery(latitude, longitude))
                 } else {
-                    Toast.makeText(requireContext(), "Unable to get location Due to GPS lost", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Unable to get location Due to GPS lost ",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    getWeatherDetailsByLastLocation()
                 }
             }
         }
@@ -151,7 +164,7 @@ class WeatherHomeFragment : Fragment() {
     /**
      * setting the weather details
      */
-    private fun setWeatherDetails (weatherUIDetails: WeatherUIDetails) {
+    private fun setWeatherDetails(weatherUIDetails: WeatherUIDetails) {
         binding.weatherDetailsView.dateTimeTextView.text = weatherUIDetails.dateTime
         binding.weatherDetailsView.temperatureTextView.text = weatherUIDetails.temperature
         binding.weatherDetailsView.weatherConditionTextView.text = weatherUIDetails.weatherIconDesc
@@ -161,7 +174,7 @@ class WeatherHomeFragment : Fragment() {
         binding.weatherDetailsView.visibilityValue.text = weatherUIDetails.visibility
         binding.weatherDetailsView.sunRaiseValue.text = weatherUIDetails.sunrise
         binding.weatherDetailsView.sunSetValue.text = weatherUIDetails.sunset
-        binding.weatherDetailsView.weatherIcon.load(weatherUIDetails.weatherIcon){
+        binding.weatherDetailsView.weatherIcon.load(weatherUIDetails.weatherIcon) {
             placeholder(R.drawable.ic_launcher_background) // Placeholder image
             error(R.drawable.ic_launcher_background)
         }
@@ -180,7 +193,7 @@ class WeatherHomeFragment : Fragment() {
      * saving the location
      */
     override fun onPause() {
-       super.onPause()
+        super.onPause()
         saveLocation(currentLat, currentLon)
     }
 
@@ -196,22 +209,24 @@ class WeatherHomeFragment : Fragment() {
      * saving the location into shared preference
      */
     private fun saveLocation(latitude: String, longitude: String) {
-        val sharedPref = requireActivity().getSharedPreferences("location_prefs", Context.MODE_PRIVATE)
-        if(latitude.isNotEmpty() && longitude.isNotEmpty()){
+        val sharedPref =
+            requireActivity().getSharedPreferences(LOCATION_PREFS, Context.MODE_PRIVATE)
+        if (latitude.isNotEmpty() && longitude.isNotEmpty()) {
             val editor = sharedPref.edit()
-            editor.putString("latitude", latitude)
-            editor.putString("longitude", longitude)
-            editor.apply() // Save the data asynchronously
+            editor.putString(KEY_LATITUDE, latitude)
+            editor.putString(KEY_LONGITUDE, longitude)
+            editor.apply()
         }
     }
 
     /**
      * getting the last used location from shared preference
      */
-    fun getLastLocation(): Pair<String, String>? {
-        val sharedPref = requireActivity().getSharedPreferences("location_prefs", Context.MODE_PRIVATE)
-        val lat = sharedPref.getString("latitude", null)
-        val lon = sharedPref.getString("longitude", null)
+    private fun getLastLocation(): Pair<String, String>? {
+        val sharedPref =
+            requireActivity().getSharedPreferences(LOCATION_PREFS, Context.MODE_PRIVATE)
+        val lat = sharedPref.getString(KEY_LATITUDE, null)
+        val lon = sharedPref.getString(KEY_LONGITUDE, null)
 
         return if (lat != null && lon != null) {
             Pair(lat, lon)
@@ -220,4 +235,22 @@ class WeatherHomeFragment : Fragment() {
         }
     }
 
+    private fun getWeatherDetailsByLastLocation() {
+        val location = getLastLocation()
+        if (location == null) {
+            Toast.makeText(
+                requireContext(),
+                "Please enter the values manually to get the weather",
+                Toast.LENGTH_SHORT
+            ).show()
+        } else {
+            location.let {
+                val latitude = it.first
+                val longitude = it.second
+                // Use the latitude and longitude
+                updateGeoCode(latitude, longitude)
+                weatherViewModel.getWeatherDetails(getWeatherQuery(latitude, longitude))
+            }
+        }
+    }
 }

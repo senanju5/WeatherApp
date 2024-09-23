@@ -8,11 +8,11 @@ import java.util.TimeZone
 /**
  * Convert TimeStamp To DateTime String
  */
-fun Int.getTimestampToDateTimeString() : String {
+fun Int.getTimestampToDateTimeString(): String {
 
     try {
         val calendar = Calendar.getInstance()
-        calendar.timeInMillis = this*1000.toLong()
+        calendar.timeInMillis = this * 1000.toLong()
 
         val outputDateFormat = SimpleDateFormat("MMM dd, yyyy - hh:mm a", Locale.ENGLISH)
         outputDateFormat.timeZone = TimeZone.getDefault()
@@ -28,11 +28,11 @@ fun Int.getTimestampToDateTimeString() : String {
 /**
  * Convert TimeStamp To Time String
  */
-fun Int.getTimestampToTimeString() : String {
+fun Int.getTimestampToTimeString(): String {
 
     try {
         val calendar = Calendar.getInstance()
-        calendar.timeInMillis = this*1000.toLong()
+        calendar.timeInMillis = this * 1000.toLong()
 
         val outputDateFormat = SimpleDateFormat("hh:mm a", Locale.ENGLISH)
         outputDateFormat.timeZone = TimeZone.getDefault()

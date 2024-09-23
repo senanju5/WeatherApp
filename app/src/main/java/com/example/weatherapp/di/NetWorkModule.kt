@@ -50,12 +50,13 @@ object NetWorkModule {
 
     @Singleton
     @Provides
-    fun provideWeatherApiService(retrofit:Retrofit): WeatherApiService {
+    fun provideWeatherApiService(retrofit: Retrofit): WeatherApiService {
         return retrofit.create(WeatherApiService::class.java)
     }
+
     @Singleton
     @Provides
-    fun provideGeoCodeApiService(retrofit:Retrofit): GeoCodeApiService {
+    fun provideGeoCodeApiService(retrofit: Retrofit): GeoCodeApiService {
         return retrofit.create(GeoCodeApiService::class.java)
     }
 }

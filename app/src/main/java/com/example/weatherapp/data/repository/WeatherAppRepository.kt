@@ -13,9 +13,9 @@ import javax.inject.Inject
  * WeatherAppRepository fetching data from remote data source
  */
 class WeatherAppRepository @Inject constructor(private val remoteDataSource: RemoteDataSource) {
-        suspend fun getWeatherDetails(queries: Map<String, String>): Flow<WeatherModel> = flow {
-            emit(remoteDataSource.getWeatherDetails(queries))
-        }.flowOn(Dispatchers.IO)
+    suspend fun getWeatherDetails(queries: Map<String, String>): Flow<WeatherModel> = flow {
+        emit(remoteDataSource.getWeatherDetails(queries))
+    }.flowOn(Dispatchers.IO)
 
     suspend fun getGeoCode(queries: Map<String, String>): Flow<GeoCodes> = flow {
         emit(remoteDataSource.getGeoCode(queries))
