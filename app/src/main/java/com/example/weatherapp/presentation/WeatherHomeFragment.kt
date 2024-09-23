@@ -1,6 +1,7 @@
 package com.example.weatherapp.presentation
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
@@ -28,17 +29,29 @@ import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.launch
 
 class WeatherHomeFragment : Fragment() {
+    private var currentLat: String = ""
+    private var currentLon: String = ""
     private lateinit var weatherViewModel: WeatherViewModel
     private lateinit var binding: FragmentWeatherHomeBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
-                // Permission granted, get the location
                 getWeatherDetails()
             } else {
-                // TODO:Permission denied check for shared preferencece lat long to show weather
-                Toast.makeText(requireContext(), "Location permission denied", Toast.LENGTH_SHORT).show()
+                val location = getLastLocation()
+                if (location == null) {
+                    Toast.makeText(requireContext(), "Please enter the values manually to get the weather", Toast.LENGTH_SHORT).show()
+                } else {
+                    location.let {
+                        val latitude = it.first
+                        val longitude = it.second
+                        // Use the latitude and longitude
+                        updateGeoCode(latitude, longitude)
+                        weatherViewModel.getWeatherDetails(getWeatherQuery(latitude, longitude))
+                    }
+                }
+
             }
         }
 
@@ -69,11 +82,15 @@ class WeatherHomeFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                     weatherViewModel.weatherUIModel.collect {
-                        Log.d("sen- Weather", it.toString())
+                        binding.progressLoader.visibility =if (it.isLoading) View.VISIBLE else View.GONE
                         if (it.weatherDetails!=null)  {
+                            binding.weatherDetailsView.root.visibility = View.VISIBLE
                             setWeatherDetails(it.weatherDetails)
                         } else {
-
+                            if(it.isError) {
+                                binding.weatherErrorView.root.visibility = View.VISIBLE
+                                binding.weatherDetailsView.root.visibility = View.GONE
+                            }
                         }
                 }
 
@@ -101,11 +118,12 @@ class WeatherHomeFragment : Fragment() {
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                 if (location != null) {
                     // Use the location to get weather data
-                    val latitude: Double = location.latitude
-                    val longitude:Double = location.longitude
+                    val latitude: String = location.latitude.toString()
+                    val longitude:String = location.longitude.toString()
+                    updateGeoCode(latitude, longitude)
                     weatherViewModel.getWeatherDetails(getWeatherQuery(latitude, longitude))
                 } else {
-                    Toast.makeText(requireContext(), "Unable to get location", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Unable to get location Due to GPS lost", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -125,9 +143,44 @@ class WeatherHomeFragment : Fragment() {
             placeholder(R.drawable.ic_launcher_background) // Placeholder image
             error(R.drawable.ic_launcher_background)
         }
+        updateGeoCode(weatherUIDetails.lat, weatherUIDetails.lon)
+    }
 
+    override fun onStop() {
+        super.onStop()
+        saveLocation(currentLat, currentLon)
+    }
 
+    override fun onPause() {
+       super.onPause()
+        saveLocation(currentLat, currentLon)
+    }
 
+    private fun updateGeoCode(lat: String, lon: String) {
+        currentLat = lat
+        currentLon = lon
+    }
+
+    private fun saveLocation(latitude: String, longitude: String) {
+        val sharedPref = requireActivity().getSharedPreferences("location_prefs", Context.MODE_PRIVATE)
+        if(latitude.isNotEmpty() && longitude.isNotEmpty()){
+            val editor = sharedPref.edit()
+            editor.putString("latitude", latitude)
+            editor.putString("longitude", longitude)
+            editor.apply() // Save the data asynchronously
+        }
+    }
+
+    fun getLastLocation(): Pair<String, String>? {
+        val sharedPref = requireActivity().getSharedPreferences("location_prefs", Context.MODE_PRIVATE)
+        val lat = sharedPref.getString("latitude", null)
+        val lon = sharedPref.getString("longitude", null)
+
+        return if (lat != null && lon != null) {
+            Pair(lat, lon)
+        } else {
+            null
+        }
     }
 
 }

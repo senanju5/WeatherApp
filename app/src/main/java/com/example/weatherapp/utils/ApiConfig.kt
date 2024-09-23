@@ -11,10 +11,10 @@ internal  object ApiConfig {
         const val GEO_ENDPOINT = "/geo/1.0/direct"
 }
 
-fun getWeatherQuery(lat:Double,lon:Double):HashMap<String,String> {
+fun getWeatherQuery(lat:String,lon:String):HashMap<String,String> {
     val query = HashMap<String, String>()
-    query["lat"] = lat.toString()
-    query["lon"] = lon.toString()
+    query["lat"] = lat
+    query["lon"] = lon
     query[ "appid"] = API_KEY
     query["units"] = "metric"
     return query

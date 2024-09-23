@@ -1,5 +1,6 @@
 package com.example.weatherapp.presentation.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.data.model.WeatherUIDetails
@@ -9,7 +10,6 @@ import com.example.weatherapp.data.network.model.weathermodel.Weather
 import com.example.weatherapp.data.network.model.weathermodel.WeatherModel
 import com.example.weatherapp.domain.GeoCodeUseCase
 import com.example.weatherapp.domain.WeatherUseCase
-import com.example.weatherapp.presentation.uimodel.GeoCodeUIModel
 import com.example.weatherapp.presentation.uimodel.WeatherUIModel
 import com.example.weatherapp.utils.ApiConfig
 import com.example.weatherapp.utils.getWeatherQuery
@@ -24,18 +24,19 @@ import javax.inject.Inject
 @HiltViewModel
 class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUseCase, private val geoCodeUseCase: GeoCodeUseCase) : ViewModel(){
 
-    private val weatherMutableSate by lazy { MutableStateFlow(WeatherUIModel(true, null))  }
+    private val weatherMutableSate by lazy { MutableStateFlow(WeatherUIModel(false, null, false))  }
     internal val weatherUIModel : StateFlow<WeatherUIModel> = weatherMutableSate
 
 
      fun getGeoCode(queries: Map<String, String>) {
-        viewModelScope.launch {
+         weatherMutableSate.value = WeatherUIModel(true, null, false)
+         viewModelScope.launch {
             geoCodeUseCase.getGeoCode(queries).collect{
                 val geoCodeUIModel =handleGeoCodeResponse(it)
                 if(geoCodeUIModel != null){
-                    getWeatherDetails(getWeatherQuery(geoCodeUIModel.lat, geoCodeUIModel.lon))
+                    getWeatherDetails(getWeatherQuery(geoCodeUIModel.lat.toString(), geoCodeUIModel.lon.toString()))
                 } else {
-                    weatherMutableSate.value = WeatherUIModel(false, null)
+                    weatherMutableSate.value = WeatherUIModel(false, null, true)
                 }
             }
         }
@@ -50,28 +51,36 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
     }
 
     fun getWeatherDetails(queries: Map<String, String>) {
+        weatherMutableSate.value = WeatherUIModel(true, null, false)
+
         viewModelScope.launch {
             weatherUseCase.getWeatherDetails(queries).collect{
                 val weatherDetails =handleWeatherResponse(it)
-                weatherMutableSate.value = WeatherUIModel(false, weatherDetails)
-
+                if(weatherDetails != null){
+                    weatherMutableSate.value = WeatherUIModel(false, weatherDetails, false)
+                } else {
+                    weatherMutableSate.value = WeatherUIModel(false, null, true)
+                }
             }
     }
      }
 
-    private fun handleWeatherResponse(weatherDetails: WeatherModel): WeatherUIDetails {
-        val weather = getWeather(weatherDetails.weather)
-       return WeatherUIDetails(
-            dateTime = weatherDetails.dt.unixTimestampToDateTimeString(),
-            temperature = weatherDetails.main.temp.toString(),
-            cityAndCountry = "${weatherDetails.name}, ${weatherDetails.sys.country}",
-            weatherIcon = "${ApiConfig.WEATHER_ICON_ENDPOINT+weather.icon}.png",
-            weatherIconDesc = weather.description,
-            humidity = "${weatherDetails.main.humidity}%",
-            pressure = "${weatherDetails.main.pressure} mBar",
-            visibility = "${weatherDetails.visibility/1000.0} KM",
-            sunrise = weatherDetails.sys.sunrise.unixTimestampToTimeString(),
-            sunset = weatherDetails.sys.sunset.unixTimestampToTimeString())
+    private fun handleWeatherResponse(weatherDetails: WeatherModel): WeatherUIDetails? {
+            val weather = getWeather(weatherDetails.weather)
+            return WeatherUIDetails(
+                dateTime = weatherDetails.dt.unixTimestampToDateTimeString(),
+                temperature = weatherDetails.main.temp.toString(),
+                cityAndCountry = "${weatherDetails.name}, ${weatherDetails.sys.country}",
+                weatherIcon = "${ApiConfig.WEATHER_ICON_ENDPOINT+weather.icon}.png",
+                weatherIconDesc = weather.description,
+                humidity = "${weatherDetails.main.humidity}%",
+                pressure = "${weatherDetails.main.pressure} mBar",
+                visibility = "${weatherDetails.visibility/1000.0} KM",
+                sunrise = weatherDetails.sys.sunrise.unixTimestampToTimeString(),
+                sunset = weatherDetails.sys.sunset.unixTimestampToTimeString(),
+                lat = weatherDetails.coord.lat.toString(),
+                lon = weatherDetails.coord.lon.toString())
+
     }
 
     fun getWeather(weatherList: List<Weather>): Weather {
