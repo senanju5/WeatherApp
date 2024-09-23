@@ -22,6 +22,7 @@ import com.example.weatherapp.R
 import com.example.weatherapp.data.model.WeatherUIDetails
 import com.example.weatherapp.databinding.FragmentWeatherHomeBinding
 import com.example.weatherapp.presentation.viewmodel.WeatherViewModel
+import com.example.weatherapp.utils.CitiUtils.isValidStateOrCity
 import com.example.weatherapp.utils.getGeoCodeQuery
 import com.example.weatherapp.utils.getWeatherQuery
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -64,7 +65,12 @@ class WeatherHomeFragment : Fragment() {
         binding.searchView.searchButton.setOnClickListener {
             val query = binding.searchView.cityEditTextView.text.toString()
             if (query.isNotEmpty()){
-                weatherViewModel.getGeoCode(getGeoCodeQuery(query))
+                if(isValidStateOrCity(query)){
+                    weatherViewModel.getGeoCode(getGeoCodeQuery(query))
+                } else {
+                    Toast.makeText(requireContext(), "please enter valid city or state in USA", Toast.LENGTH_SHORT).show()
+                }
+
             } else {
                 Toast.makeText(requireContext(), "please enter some value to search", Toast.LENGTH_SHORT).show()
 
