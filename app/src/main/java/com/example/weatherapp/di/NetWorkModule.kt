@@ -1,7 +1,8 @@
 package com.example.weatherapp.di
 
-import com.example.weatherapp.BuildConfig
+import com.example.weatherapp.data.network.GeoCodeApiService
 import com.example.weatherapp.data.network.WeatherApiService
+import com.example.weatherapp.utils.ApiConfig.BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,7 +40,7 @@ object NetWorkModule {
         gsonConverterFactory: GsonConverterFactory
     ): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(BuildConfig.BASE_URL)
+            .baseUrl(BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(gsonConverterFactory)
             .build()
@@ -49,5 +50,10 @@ object NetWorkModule {
     @Provides
     fun provideWeatherApiService(retrofit:Retrofit): WeatherApiService {
         return retrofit.create(WeatherApiService::class.java)
+    }
+    @Singleton
+    @Provides
+    fun provideGeoCodeApiService(retrofit:Retrofit): GeoCodeApiService {
+        return retrofit.create(GeoCodeApiService::class.java)
     }
 }
