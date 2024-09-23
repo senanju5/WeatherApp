@@ -1,5 +1,8 @@
 package com.example.weatherapp.utils
 
+/**
+ * citi utils
+ */
 object CitiUtils {
     private fun getUsCities(): List<String> {
         return listOf(

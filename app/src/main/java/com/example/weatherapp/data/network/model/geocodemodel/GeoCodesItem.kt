@@ -3,6 +3,9 @@ package com.example.weatherapp.data.network.model.geocodemodel
 
 import com.google.gson.annotations.SerializedName
 
+/**
+ * Data class representing the response from the Geocoding API
+ */
 data class GeoCodesItem(
     @SerializedName("country")
     val country: String, // US

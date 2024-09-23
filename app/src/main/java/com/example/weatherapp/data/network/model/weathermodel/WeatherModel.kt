@@ -3,6 +3,10 @@ package com.example.weatherapp.data.network.model.weathermodel
 
 import com.google.gson.annotations.SerializedName
 
+/**
+ * Data class that represents the weather model.
+ */
+
 data class WeatherModel(
     @SerializedName("base")
     val base: String, // stations

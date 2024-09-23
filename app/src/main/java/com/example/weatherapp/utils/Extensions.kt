@@ -5,6 +5,9 @@ import java.util.Calendar
 import java.util.Locale
 import java.util.TimeZone
 
+/**
+ * Extension functions for the weather details conversion
+ */
 fun Int.unixTimestampToDateTimeString() : String {
 
     try {

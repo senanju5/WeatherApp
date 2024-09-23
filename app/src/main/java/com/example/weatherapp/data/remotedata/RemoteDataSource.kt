@@ -6,6 +6,9 @@ import com.example.weatherapp.data.network.model.geocodemodel.GeoCodes
 import com.example.weatherapp.data.network.model.weathermodel.WeatherModel
 import javax.inject.Inject
 
+/**
+ * RemoteDataSource to get data from API
+ */
 class RemoteDataSource @Inject constructor(private val weatherApiService: WeatherApiService, private val geoApiService: GeoCodeApiService) {
     suspend fun getWeatherDetails (queries:Map<String, String>): WeatherModel {
             return weatherApiService.getWeatherDetails(queries)

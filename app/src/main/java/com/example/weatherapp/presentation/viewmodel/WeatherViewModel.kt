@@ -21,6 +21,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * Weather view model for getting weather details
+ */
 @HiltViewModel
 class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUseCase, private val geoCodeUseCase: GeoCodeUseCase) : ViewModel(){
 

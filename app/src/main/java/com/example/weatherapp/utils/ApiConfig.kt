@@ -1,8 +1,10 @@
 package com.example.weatherapp.utils
 
-import com.example.weatherapp.data.network.model.geocodemodel.GeoCodesItem
 import com.example.weatherapp.utils.ApiConfig.API_KEY
 
+/**
+ * AppConfig utils
+ */
 internal  object ApiConfig {
         const val BASE_URL = "https://api.openweathermap.org"
         const val API_KEY = "6b752f3d405f987d00a62dd42d7b4017"

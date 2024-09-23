@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:id="@+id/errorViewLayout"
     android:padding="16dp"
-    tools:context=".presentation.WeatherHomeFragment">
+    tools:context=".presentation.ui.fragment.WeatherHomeFragment">
 
 
     <include android:id="@+id/searchView"
