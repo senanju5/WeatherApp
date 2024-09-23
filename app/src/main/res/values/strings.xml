@@ -2,4 +2,14 @@
     <string name="app_name">WeatherApp</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="enter_city_name_or_state_name">Enter City Name</string>
+    <string name="degree_celsius">°C</string>
+    <string name="description_weather_condition_icon">weather condition icon</string>
+    <string name="label_humidity">Humidity</string>
+    <string name="label_pressure">Pressure</string>
+    <string name="label_visibility">Visibility</string>
+    <string name="label_sunrise">Sunrise</string>
+    <string name="label_sunset">Sunset</string>
+    <string name="please_search_again">Please search again</string>
+    <string name="search">Search</string>
 </resources>

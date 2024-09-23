@@ -16,8 +16,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import coil.load
+import com.example.weatherapp.R
+import com.example.weatherapp.data.model.WeatherUIDetails
 import com.example.weatherapp.databinding.FragmentWeatherHomeBinding
 import com.example.weatherapp.presentation.viewmodel.WeatherViewModel
+import com.example.weatherapp.utils.getGeoCodeQuery
 import com.example.weatherapp.utils.getWeatherQuery
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -33,7 +37,7 @@ class WeatherHomeFragment : Fragment() {
                 // Permission granted, get the location
                 getWeatherDetails()
             } else {
-                // Permission denied
+                // TODO:Permission denied check for shared preferencece lat long to show weather
                 Toast.makeText(requireContext(), "Location permission denied", Toast.LENGTH_SHORT).show()
             }
         }
@@ -44,6 +48,15 @@ class WeatherHomeFragment : Fragment() {
     ): View? {
         weatherViewModel = ViewModelProvider(requireActivity())[WeatherViewModel::class.java]
         binding = FragmentWeatherHomeBinding.inflate(inflater, container, false)
+        binding.searchView.searchButton.setOnClickListener {
+            val query = binding.searchView.cityEditTextView.text.toString()
+            if (query.isNotEmpty()){
+                weatherViewModel.getGeoCode(getGeoCodeQuery(query))
+            } else {
+                Toast.makeText(requireContext(), "please enter some value to search", Toast.LENGTH_SHORT).show()
+
+            }
+        }
         return binding.root
     }
 
@@ -54,18 +67,14 @@ class WeatherHomeFragment : Fragment() {
 
     init {
         lifecycleScope.launch {
-//            repeatOnLifecycle(Lifecycle.State.STARTED) {
-//                weatherViewModel.geoCodeUIModel.collect { it ->
-//                    Log.d("sen- GeoCode", it.toString())
-//                    weatherViewModel.weatherUIModel.collect {
-//                        Log.d("sen- Weather", it.toString())
-//                    }
-//                }
-//
-//            }
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                     weatherViewModel.weatherUIModel.collect {
                         Log.d("sen- Weather", it.toString())
+                        if (it.weatherDetails!=null)  {
+                            setWeatherDetails(it.weatherDetails)
+                        } else {
+
+                        }
                 }
 
             }
@@ -87,6 +96,7 @@ class WeatherHomeFragment : Fragment() {
     }
 
     private fun getWeatherDetails() {
+
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                 if (location != null) {
@@ -99,6 +109,25 @@ class WeatherHomeFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun setWeatherDetails (weatherUIDetails: WeatherUIDetails) {
+        binding.weatherDetailsView.dateTimeTextView.text = weatherUIDetails.dateTime
+        binding.weatherDetailsView.temperatureTextView.text = weatherUIDetails.temperature
+        binding.weatherDetailsView.weatherConditionTextView.text = weatherUIDetails.weatherIconDesc
+        binding.weatherDetailsView.cityTextView.text = weatherUIDetails.cityAndCountry
+        binding.weatherDetailsView.humidityValue.text = weatherUIDetails.humidity
+        binding.weatherDetailsView.pressureValue.text = weatherUIDetails.pressure
+        binding.weatherDetailsView.visibilityValue.text = weatherUIDetails.visibility
+        binding.weatherDetailsView.sunRaiseValue.text = weatherUIDetails.sunrise
+        binding.weatherDetailsView.sunSetValue.text = weatherUIDetails.sunset
+        binding.weatherDetailsView.weatherIcon.load(weatherUIDetails.weatherIcon){
+            placeholder(R.drawable.ic_launcher_background) // Placeholder image
+            error(R.drawable.ic_launcher_background)
+        }
+
+
+
     }
 
 }

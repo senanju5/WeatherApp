@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+
+    <TextView
+        android:id="@+id/dateTimeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="16dp"
+        tools:text="23 sep, 2024 3 AM"
+        android:textSize="20sp"/>
+    <TextView
+        android:id="@+id/temperatureTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="70sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dateTimeTextView"
+        tools:text="33" />
+
+    <TextView
+        android:id="@+id/celsiusTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/degree_celsius"
+        android:textSize="35sp"
+        app:layout_constraintStart_toEndOf="@id/temperatureTextView"
+        app:layout_constraintTop_toTopOf="@id/temperatureTextView" />
+
+    <ImageView
+        android:id="@+id/weatherIcon"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:contentDescription="@string/description_weather_condition_icon"
+        android:scaleType="centerCrop"
+        app:layout_constraintStart_toStartOf="@id/celsiusTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/celsiusTextView"
+        tools:src="@drawable/ic_launcher_background" />
+    <TextView
+        android:id="@+id/weatherConditionTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/weatherIcon"
+        app:layout_constraintStart_toStartOf="@id/celsiusTextView"
+        tools:text="broken cloud" />
+    <TextView
+        android:id="@+id/cityTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/temperatureTextView"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:textSize="20sp"
+        android:text="Chicago"/>
+
+    <TextView
+        android:id="@+id/humidityLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_humidity"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cityTextView" />
+
+    <TextView
+        android:id="@+id/humidityValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/humidityLabel"
+        app:layout_constraintTop_toTopOf="@id/humidityLabel"
+        android:layout_marginLeft="20dp"
+        tools:text="70%" />
+
+    <TextView
+        android:id="@+id/pressureLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/label_pressure"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/humidityLabel" />
+
+    <TextView
+        android:id="@+id/pressureValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/pressureLabel"
+        app:layout_constraintLeft_toRightOf="@id/pressureLabel"
+        android:layout_marginLeft="20dp"
+        tools:text="1001 mBar" />
+
+    <TextView
+        android:id="@+id/visibilityLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/label_visibility"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pressureLabel" />
+
+    <TextView
+        android:id="@+id/visibilityValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/visibilityLabel"
+        app:layout_constraintLeft_toRightOf="@id/visibilityLabel"
+        android:layout_marginLeft="20dp"
+        tools:text="4 km" />
+
+    <TextView
+        android:id="@+id/sunRaiseLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/label_sunrise"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/visibilityLabel" />
+
+    <TextView
+        android:id="@+id/sunRaiseValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/sunRaiseLabel"
+        app:layout_constraintLeft_toRightOf="@id/sunRaiseLabel"
+        android:layout_marginLeft="20dp"
+        tools:text="4 km" />
+
+    <TextView
+        android:id="@+id/sunSetLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/label_sunset"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sunRaiseLabel" />
+
+    <TextView
+        android:id="@+id/sunSetValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/sunSetLabel"
+        app:layout_constraintLeft_toRightOf="@id/sunSetLabel"
+        android:layout_marginLeft="20dp"
+        tools:text="4 km" />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

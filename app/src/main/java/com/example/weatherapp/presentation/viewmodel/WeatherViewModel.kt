@@ -24,9 +24,6 @@ import javax.inject.Inject
 @HiltViewModel
 class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUseCase, private val geoCodeUseCase: GeoCodeUseCase) : ViewModel(){
 
-    private val geoCodeMutableSate by lazy { MutableStateFlow(GeoCodeUIModel(true, null))  }
-    internal val geoCodeUIModel : StateFlow<GeoCodeUIModel> = geoCodeMutableSate
-
     private val weatherMutableSate by lazy { MutableStateFlow(WeatherUIModel(true, null))  }
     internal val weatherUIModel : StateFlow<WeatherUIModel> = weatherMutableSate
 
@@ -38,9 +35,8 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
                 if(geoCodeUIModel != null){
                     getWeatherDetails(getWeatherQuery(geoCodeUIModel.lat, geoCodeUIModel.lon))
                 } else {
-                    geoCodeMutableSate.value = GeoCodeUIModel(false, null)
+                    weatherMutableSate.value = WeatherUIModel(false, null)
                 }
-
             }
         }
     }
