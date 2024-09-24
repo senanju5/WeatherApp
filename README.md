@@ -1,1 +1,1 @@
-# Project Name
+# Weather App (MVVM architecture)
