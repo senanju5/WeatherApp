@@ -29,7 +29,7 @@ class WeatherViewModel @Inject constructor(
     private val geoCodeUseCase: GeoCodeUseCase
 ) : ViewModel() {
 
-    private val weatherMutableSate by lazy { MutableStateFlow(WeatherUIModel(false, null, false)) }
+    private val weatherMutableSate = MutableStateFlow(WeatherUIModel(false, null, false))
     internal val weatherUIModel: StateFlow<WeatherUIModel> = weatherMutableSate
 
 
@@ -70,17 +70,18 @@ class WeatherViewModel @Inject constructor(
      * Get weather details
      */
     fun getWeatherDetails(queries: Map<String, String>) {
-        weatherMutableSate.value = WeatherUIModel(true, null, false)
-
         viewModelScope.launch {
-            weatherUseCase.getWeatherDetails(queries).collect {
-                val weatherDetails = handleWeatherResponse(it)
-                if (weatherDetails != null) {
-                    weatherMutableSate.value = WeatherUIModel(false, weatherDetails, false)
-                } else {
-                    weatherMutableSate.value = WeatherUIModel(false, null, true)
+            if(weatherMutableSate.value.weatherDetails==null){
+                weatherUseCase.getWeatherDetails(queries).collect {
+                    val weatherDetails = handleWeatherResponse(it)
+                    if (weatherDetails != null) {
+                        weatherMutableSate.value = WeatherUIModel(false, weatherDetails, false)
+                    } else {
+                        weatherMutableSate.value = WeatherUIModel(false, null, true)
+                    }
                 }
             }
+
         }
     }
 

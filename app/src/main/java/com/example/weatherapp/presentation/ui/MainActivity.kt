@@ -12,20 +12,4 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
     }
-
-//    init {
-//        lifecycleScope.launch {
-//            repeatOnLifecycle(Lifecycle.State.STARTED) {
-//                weatherViewModel.geoCodeUIModel.collect { it ->
-//                    Log.d("sen- GeoCode", it.toString())
-//                    weatherViewModel.weatherUIModel.collect {
-//                        Log.d("sen- Weather", it.toString())
-//                        binding.cityTextView.text = it.weatherDetails?.cityAndCountry ?: "error"
-//                    }
-//                }
-//
-//            }
-//
-//        }
-//    }
 }

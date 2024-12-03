@@ -12,8 +12,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import coil.load
@@ -27,14 +27,18 @@ import com.example.weatherapp.utils.SharePreferenceUtils.KEY_LONGITUDE
 import com.example.weatherapp.utils.SharePreferenceUtils.LOCATION_PREFS
 import com.example.weatherapp.utils.getGeoCodeQuery
 import com.example.weatherapp.utils.getWeatherQuery
+import com.example.weatherapp.utils.hide
+import com.example.weatherapp.utils.show
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class WeatherHomeFragment : Fragment() {
     private var currentLat: String = ""
     private var currentLon: String = ""
-    private lateinit var weatherViewModel: WeatherViewModel
+    private  val weatherViewModel by viewModels<WeatherViewModel>()
     private lateinit var binding: FragmentWeatherHomeBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
@@ -54,7 +58,6 @@ class WeatherHomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        weatherViewModel = ViewModelProvider(requireActivity())[WeatherViewModel::class.java]
         binding = FragmentWeatherHomeBinding.inflate(inflater, container, false)
         binding.searchView.searchButton.setOnClickListener {
             val query = binding.searchView.cityEditTextView.text.toString()
@@ -92,18 +95,17 @@ class WeatherHomeFragment : Fragment() {
         /**
          * Observing the weather UI model
          */
-        lifecycleScope.launch {
+      lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 weatherViewModel.weatherUIModel.collect {
-                    binding.progressLoader.visibility =
-                        if (it.isLoading) View.VISIBLE else View.GONE
+                        if (it.isLoading) binding.progressLoader.show() else binding.progressLoader.hide()
                     if (it.weatherDetails != null) {
-                        binding.weatherDetailsView.root.visibility = View.VISIBLE
+                        binding.weatherDetailsView.root.show()
                         setWeatherDetails(it.weatherDetails)
                     } else {
                         if (it.isError) {
-                            binding.weatherErrorView.root.visibility = View.VISIBLE
-                            binding.weatherDetailsView.root.visibility = View.GONE
+                            binding.weatherErrorView.root.show()
+                            binding.weatherDetailsView.root.hide()
                         }
                     }
                 }
